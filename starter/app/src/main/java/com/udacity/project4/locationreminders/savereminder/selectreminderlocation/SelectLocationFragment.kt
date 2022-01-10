@@ -117,7 +117,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
         if (isPermissionGranted()) {
-            val zoomLevel = 10f
+            val zoomLevel = 15f
             mMap.isMyLocationEnabled = true
 
             val locationManager = requireActivity().getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
