@@ -7,7 +7,16 @@ import java.lang.Exception
 //Use FakeDataSource that acts as a test double to the LocalDataSource
 class FakeDataSource(private val reminders: MutableList<ReminderDTO>? = mutableListOf()) : ReminderDataSource {
 
+    private var shouldReturnError = false
+
+    fun setReturnError(value: Boolean) {
+        shouldReturnError = value
+    }
+
     override suspend fun getReminders(): Result<List<ReminderDTO>> {
+        if (shouldReturnError) {
+            return Result.Error("Reminders not found")
+        }
         return if (reminders != null) {
             Result.Success(reminders)
         } else {
@@ -20,6 +29,9 @@ class FakeDataSource(private val reminders: MutableList<ReminderDTO>? = mutableL
     }
 
     override suspend fun getReminder(id: String): Result<ReminderDTO> {
+        if (shouldReturnError) {
+            return Result.Error("Reminders not found")
+        }
         return if (reminders != null) {
             for (item in reminders) {
                 if (item.id == id) {
