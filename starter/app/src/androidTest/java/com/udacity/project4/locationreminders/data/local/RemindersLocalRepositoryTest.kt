@@ -34,9 +34,9 @@ class RemindersLocalRepositoryTest {
 
     @Before
     fun createDatabase() {
-        database = Room.databaseBuilder(
+        database = Room.inMemoryDatabaseBuilder(
             ApplicationProvider.getApplicationContext(),
-            RemindersDatabase::class.java, "locationReminders.db"
+            RemindersDatabase::class.java
         )
         .allowMainThreadQueries()
         .build()
