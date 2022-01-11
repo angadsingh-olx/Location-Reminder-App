@@ -104,7 +104,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
+        setMapStyle(mMap)
         setPoiClick(mMap)
         enableMyLocation()
     }
@@ -151,6 +151,20 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
             binding.actionSave.isEnabled = true
             binding.actionSave.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.colorAccent, null))
+        }
+    }
+
+    private fun setMapStyle(map: GoogleMap) {
+        try {
+            map.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(),
+                    R.raw.map_style
+                )
+
+            )
+        } catch (e: Resources.NotFoundException) {
+            e.printStackTrace()
         }
     }
 
