@@ -92,7 +92,7 @@ class SaveReminderFragment : BaseFragment() {
 
             val geofencePendingIntent = PendingIntent.getBroadcast(
                 requireContext(),
-                0,
+                1234,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
