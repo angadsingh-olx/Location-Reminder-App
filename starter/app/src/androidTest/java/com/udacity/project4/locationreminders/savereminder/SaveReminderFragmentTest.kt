@@ -79,8 +79,6 @@ class SaveReminderFragmentTest {
 
     @Test
     fun testNavigationToReminderListFragment() {
-        viewModel.reminderTitle.postValue("Title")
-        viewModel.reminderDescription.postValue("Description")
         viewModel.reminderSelectedLocationStr.postValue("Location")
         viewModel.latitude.postValue(77.0)
         viewModel.longitude.postValue(28.3)
@@ -92,6 +90,10 @@ class SaveReminderFragmentTest {
         scenario.onFragment {
             Navigation.setViewNavController(it.view!!, navController)
         }
+
+        onView(ViewMatchers.withId(R.id.reminderTitle)).perform(typeText("Title"))
+        onView(ViewMatchers.withId(R.id.reminderDescription)).perform(typeText("Description"))
+        closeSoftKeyboard()
         onView(ViewMatchers.withId(R.id.saveReminder)).perform(ViewActions.click())
         Mockito.verify(navController).popBackStack()
     }
