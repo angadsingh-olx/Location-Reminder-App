@@ -97,7 +97,7 @@ class SaveReminderFragment : BaseFragment() {
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
 
-            if (_viewModel.validateEnteredData(reminderData)) {
+            if (_viewModel.validateAndSaveReminder(reminderData)) {
                 geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
                     addOnSuccessListener {
                         Log.e("Add Geofence", geofence.requestId)
@@ -108,8 +108,6 @@ class SaveReminderFragment : BaseFragment() {
                         }
                     }
                 }
-
-                _viewModel.saveReminder(reminderData)
             }
         }
 
