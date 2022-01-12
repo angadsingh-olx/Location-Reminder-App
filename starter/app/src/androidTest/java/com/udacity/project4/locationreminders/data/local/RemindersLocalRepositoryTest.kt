@@ -74,6 +74,16 @@ class RemindersLocalRepositoryTest {
     }
 
     @Test
+    fun testErrorReminderById() = runBlocking {
+        val result = remindersRepository.getReminder(testData.id)
+        Assert.assertTrue(result is Result.Error)
+
+        result as Result.Error
+
+        Assert.assertEquals("Error message are not equal", "Reminder not found!", result.message)
+    }
+
+    @Test
     fun testDeletionAll() = runBlocking {
         remindersRepository.saveReminder(testData)
         remindersRepository.deleteAllReminders()
