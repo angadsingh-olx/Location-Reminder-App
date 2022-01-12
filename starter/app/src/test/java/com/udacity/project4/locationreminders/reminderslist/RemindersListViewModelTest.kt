@@ -67,5 +67,6 @@ class RemindersListViewModelTest {
         viewModel.loadReminders()
 
         Assert.assertTrue("The UI is showing no data", viewModel.showNoData.getOrAwaitValue())
+        Assert.assertEquals("The UI is showing error snackbar", "Reminders not found", viewModel.showSnackBar.getOrAwaitValue())
     }
 }
