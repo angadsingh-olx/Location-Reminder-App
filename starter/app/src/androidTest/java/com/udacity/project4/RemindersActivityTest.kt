@@ -2,6 +2,7 @@ package com.udacity.project4
 
 import android.Manifest
 import android.app.Application
+import android.view.View
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
@@ -12,7 +13,10 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.udacity.project4.locationreminders.RemindersActivity
@@ -41,6 +45,9 @@ import org.koin.test.get
 import androidx.test.rule.GrantPermissionRule
 
 import org.junit.Rule
+import androidx.test.rule.ActivityTestRule
+import org.hamcrest.CoreMatchers.not
+
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -52,7 +59,6 @@ class RemindersActivityTest :
     private lateinit var appContext: Application
 
     private val dataBindingIdlingResource = DataBindingIdlingResource()
-
 
     @Before
     fun registerIdlingResource() {
@@ -110,10 +116,10 @@ class RemindersActivityTest :
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
-        onView(ViewMatchers.withId(R.id.noDataTextView))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.noDataTextView))
-            .check(ViewAssertions.matches(ViewMatchers.withText((getApplicationContext() as Application).getString(R.string.no_data))))
+        onView(withId(R.id.noDataTextView))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.noDataTextView))
+            .check(matches(withText((getApplicationContext() as Application).getString(R.string.no_data))))
             activityScenario.close()
     }
 
@@ -130,14 +136,14 @@ class RemindersActivityTest :
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
-        onView(ViewMatchers.withId(R.id.title)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.title)).check(ViewAssertions.matches(ViewMatchers.withText(testData.title)))
+        onView(withId(R.id.title)).check(matches(isDisplayed()))
+        onView(withId(R.id.title)).check(matches(withText(testData.title)))
 
-        onView(ViewMatchers.withId(R.id.description)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.description)).check(ViewAssertions.matches(ViewMatchers.withText(testData.description)))
+        onView(withId(R.id.description)).check(matches(isDisplayed()))
+        onView(withId(R.id.description)).check(matches(withText(testData.description)))
 
-        onView(ViewMatchers.withId(R.id.location)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.location)).check(ViewAssertions.matches(ViewMatchers.withText(testData.location)))
+        onView(withId(R.id.location)).check(matches(isDisplayed()))
+        onView(withId(R.id.location)).check(matches(withText(testData.location)))
     }
 
     @Test
@@ -152,14 +158,20 @@ class RemindersActivityTest :
         )
 
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+
+        var decorView: View ?= null
+        activityScenario.onActivity {
+            decorView = it.window.decorView;
+        }
+
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
-        onView(ViewMatchers.withId(R.id.noDataTextView))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.noDataTextView))
-            .check(ViewAssertions.matches(ViewMatchers.withText((getApplicationContext() as Application).getString(R.string.no_data))))
+        onView(withId(R.id.noDataTextView))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.noDataTextView))
+            .check(matches(withText((getApplicationContext() as Application).getString(R.string.no_data))))
 
-        onView(ViewMatchers.withId(R.id.addReminderFAB)).perform(ViewActions.click())
+        onView(withId(R.id.addReminderFAB)).perform(ViewActions.click())
 
         val viewModel: SaveReminderViewModel = get()
         viewModel.reminderSelectedLocationStr.postValue(testData.location)
@@ -167,19 +179,81 @@ class RemindersActivityTest :
         viewModel.longitude.postValue(testData.longitude)
         viewModel.skipLocationForTesting = true
 
-        onView(ViewMatchers.withId(R.id.reminderTitle)).perform(ViewActions.typeText(testData.title))
-        onView(ViewMatchers.withId(R.id.reminderDescription)).perform(ViewActions.typeText(testData.description))
+        onView(withId(R.id.reminderTitle)).perform(ViewActions.typeText(testData.title))
+        onView(withId(R.id.reminderDescription)).perform(ViewActions.typeText(testData.description))
         closeSoftKeyboard()
-        onView(ViewMatchers.withId(R.id.saveReminder)).perform(ViewActions.click())
+        onView(withId(R.id.saveReminder)).perform(ViewActions.click())
 
-        onView(ViewMatchers.withId(R.id.title)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.title)).check(ViewAssertions.matches(ViewMatchers.withText(testData.title)))
+        onView(withText(appContext.getString(R.string.reminder_saved)))
+            .inRoot(withDecorView(not(decorView)))
+            .check(matches(isDisplayed()))
 
-        onView(ViewMatchers.withId(R.id.description)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.description)).check(ViewAssertions.matches(ViewMatchers.withText(testData.description)))
+        onView(withId(R.id.title)).check(matches(isDisplayed()))
+        onView(withId(R.id.title)).check(matches(withText(testData.title)))
 
-        onView(ViewMatchers.withId(R.id.location)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.location)).check(ViewAssertions.matches(ViewMatchers.withText(testData.location)))
+        onView(withId(R.id.description)).check(matches(isDisplayed()))
+        onView(withId(R.id.description)).check(matches(withText(testData.description)))
+
+        onView(withId(R.id.location)).check(matches(isDisplayed()))
+        onView(withId(R.id.location)).check(matches(withText(testData.location)))
+        activityScenario.close()
+    }
+
+    @Test
+    fun testShowTitleErrorSnackbar() {
+
+        val testData = ReminderDTO(
+            "Title",
+            "Description",
+            "location",
+            0.0, 0.0
+        )
+
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(withId(R.id.addReminderFAB)).perform(ViewActions.click())
+
+        val viewModel: SaveReminderViewModel = get()
+        viewModel.reminderSelectedLocationStr.postValue(testData.location)
+        viewModel.latitude.postValue(testData.latitude)
+        viewModel.longitude.postValue(testData.longitude)
+        viewModel.skipLocationForTesting = true
+
+        onView(withId(R.id.reminderDescription)).perform(ViewActions.typeText(testData.description))
+        closeSoftKeyboard()
+        onView(withId(R.id.saveReminder)).perform(ViewActions.click())
+
+        onView(withId(com.google.android.material.R.id.snackbar_text)).check(matches(withText(R.string.err_enter_title)))
+        activityScenario.close()
+    }
+
+    @Test
+    fun testShowLocationErrorSnackbar() {
+
+        val testData = ReminderDTO(
+            "Title",
+            "Description",
+            "location",
+            0.0, 0.0
+        )
+
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(withId(R.id.addReminderFAB)).perform(ViewActions.click())
+
+        val viewModel: SaveReminderViewModel = get()
+        viewModel.latitude.postValue(testData.latitude)
+        viewModel.longitude.postValue(testData.longitude)
+        viewModel.skipLocationForTesting = true
+
+        onView(withId(R.id.reminderTitle)).perform(ViewActions.typeText(testData.title))
+        onView(withId(R.id.reminderDescription)).perform(ViewActions.typeText(testData.description))
+        closeSoftKeyboard()
+        onView(withId(R.id.saveReminder)).perform(ViewActions.click())
+
+        onView(withId(com.google.android.material.R.id.snackbar_text)).check(matches(withText(R.string.err_select_location)))
         activityScenario.close()
     }
 }
