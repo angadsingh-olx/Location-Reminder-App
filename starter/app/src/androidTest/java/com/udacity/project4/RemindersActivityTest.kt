@@ -1,5 +1,6 @@
 package com.udacity.project4
 
+import android.Manifest
 import android.app.Application
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ActivityScenario
@@ -37,6 +38,9 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
 import org.koin.test.get
+import androidx.test.rule.GrantPermissionRule
+
+import org.junit.Rule
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest

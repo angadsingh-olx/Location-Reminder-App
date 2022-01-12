@@ -69,7 +69,9 @@ class SaveReminderFragment : BaseFragment() {
         }
 
         binding.saveReminder.setOnClickListener {
-            checkPermissionForLocation()
+            if (_viewModel.validateEnteredData(getReminderData())) {
+                checkPermissionForLocation()
+            }
         }
 
         _viewModel.selectedPOI.observe(viewLifecycleOwner, Observer {
@@ -88,16 +90,14 @@ class SaveReminderFragment : BaseFragment() {
         val geofencingRequest = getGeoFencingRequest(geofence)
         val geofencePendingIntent = getGeoFencingPendingIntent()
 
-        if (_viewModel.validateEnteredData(reminderData)) {
-            geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
-                addOnSuccessListener {
-                    Log.e("Add Geofence", geofence.requestId)
-                    _viewModel.validateAndSaveReminder(reminderData)
-                }
-                addOnFailureListener {
-                    if ((it.message != null)) {
-                        Log.w(TAG, it.message, it)
-                    }
+        geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
+            addOnSuccessListener {
+                Log.e("Add Geofence", geofence.requestId)
+                _viewModel.validateAndSaveReminder(reminderData)
+            }
+            addOnFailureListener {
+                if ((it.message != null)) {
+                    Log.w(TAG, it.message, it)
                 }
             }
         }
@@ -214,6 +214,11 @@ class SaveReminderFragment : BaseFragment() {
                 ).setAction(android.R.string.ok) {
                     checkDeviceLocationSettings()
                 }.show()
+            }
+        }
+        locationSettingsResponseTask.addOnCompleteListener {
+            if (it.isSuccessful) {
+                addGeoFenceAndData()
             }
         }
     }
