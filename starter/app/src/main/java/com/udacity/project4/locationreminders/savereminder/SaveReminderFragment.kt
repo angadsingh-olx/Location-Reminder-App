@@ -70,7 +70,11 @@ class SaveReminderFragment : BaseFragment() {
 
         binding.saveReminder.setOnClickListener {
             if (_viewModel.validateEnteredData(getReminderData())) {
-                checkPermissionForLocation()
+                if (!_viewModel.skipLocationForTesting) {
+                    checkPermissionForLocation()
+                } else {
+                    _viewModel.validateAndSaveReminder(getReminderData())
+                }
             }
         }
 

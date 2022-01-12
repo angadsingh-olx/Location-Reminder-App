@@ -82,6 +82,7 @@ class SaveReminderFragmentTest {
         viewModel.reminderSelectedLocationStr.postValue("Location")
         viewModel.latitude.postValue(77.0)
         viewModel.longitude.postValue(28.3)
+        viewModel.skipLocationForTesting = true
 
         val scenario = launchFragmentInContainer<SaveReminderFragment>(themeResId = R.style.AppTheme)
         dataBindingIdlingResource.monitorFragment(scenario)

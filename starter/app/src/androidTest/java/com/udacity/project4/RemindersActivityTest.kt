@@ -165,6 +165,7 @@ class RemindersActivityTest :
         viewModel.reminderSelectedLocationStr.postValue(testData.location)
         viewModel.latitude.postValue(testData.latitude)
         viewModel.longitude.postValue(testData.longitude)
+        viewModel.skipLocationForTesting = true
 
         onView(ViewMatchers.withId(R.id.reminderTitle)).perform(ViewActions.typeText(testData.title))
         onView(ViewMatchers.withId(R.id.reminderDescription)).perform(ViewActions.typeText(testData.description))
