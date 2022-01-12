@@ -26,6 +26,7 @@ import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
+import java.util.*
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
@@ -60,7 +61,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     private fun onLocationSelected() {
-        _viewModel.savePointOfInterest()
         findNavController().navigateUp()
     }
 
@@ -93,6 +93,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         mMap = googleMap
         setMapStyle(mMap)
         setPoiClick(mMap)
+        setMapLongClick(mMap)
         enableMyLocation()
     }
 
@@ -136,11 +137,41 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                     .title(poi.name)
             )
             poiMarker?.showInfoWindow()
-            _viewModel.poi = poi
+            _viewModel.latitude.value = poi.latLng.latitude
+            _viewModel.longitude.value = poi.latLng.longitude
+            _viewModel.reminderSelectedLocationStr.value = poi.name
 
-            binding.actionSave.isEnabled = true
-            binding.actionSave.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.colorAccent, null))
+            enableSave()
         }
+    }
+
+    private fun setMapLongClick(map: GoogleMap) {
+        map.setOnMapLongClickListener { latLng ->
+            map.clear()
+            val snippet = String.format(
+                Locale.getDefault(),
+                getString(R.string.lat_long_snippet),
+                latLng.latitude,
+                latLng.longitude
+            )
+            map.addMarker(
+                MarkerOptions()
+                    .position(latLng)
+                    .title(getString(R.string.dropped_pin))
+                    .snippet(snippet)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            )
+            _viewModel.latitude.value = latLng.latitude
+            _viewModel.longitude.value = latLng.longitude
+            _viewModel.reminderSelectedLocationStr.value = getString(R.string.dropped_pin)
+
+            enableSave()
+        }
+    }
+
+    private fun enableSave() {
+        binding.actionSave.isEnabled = true
+        binding.actionSave.setBackgroundColor(ResourcesCompat.getColor(resources, R.color.colorAccent, null))
     }
 
     private fun setMapStyle(map: GoogleMap) {
